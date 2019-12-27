@@ -1,0 +1,31 @@
+syntax="proto3";
+
+package BCDns_daemon;
+
+message SwapCertMsg {
+    string ip = 1;
+}
+
+message StartServerReq {}
+
+message StartServerRep {
+    bool isLeader = 1;
+}
+
+message StartClientReq {}
+
+message StartClientRep {
+    string latency = 1;
+    string throughout = 2;
+}
+
+message StopMsg {}
+
+message OrderRep {}
+
+service Method {
+    rpc DoSwapCert(SwapCertMsg) returns (OrderRep) {}
+    rpc DoStartServer(StartServerReq) returns(StartServerRep) {}
+    rpc DoStartClient(StartClientReq) returns(StartClientRep) {}
+    rpc DoStop(StopMsg) returns(OrderRep) {}
+}
