@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -16,8 +17,8 @@ import (
 var (
 	Addr = "0.0.0.0:5000"
 	StatusAddr = "127.0.0.1:5001"
-	ProjectPath = "/var/opt/go/src/BCDns_0.1/"
-	ClientPath = "/var/opt/go/src/BCDns_client/"
+	ProjectPath = "/go/src/BCDns_0.1/"
+	ClientPath = "/go/src/BCDns_client/"
 	Conn *net.UDPConn
 )
 
@@ -83,6 +84,10 @@ func (*Server) DoStartClient(context.Context, *BCDns_daemon.StartClientReq) (*BC
 	if err != nil {
 		return &BCDns_daemon.StartClientRep{}, err
 	}
+	defer func() {
+		cmd := exec.Command(ProjectPath + "stop.sh")
+		_ = cmd.Run()
+	}()
 	cmd = exec.Command(ProjectPath + "count.sh")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -96,10 +101,16 @@ func (*Server) DoStartClient(context.Context, *BCDns_daemon.StartClientReq) (*BC
 }
 
 func (*Server) DoStop(context.Context, *BCDns_daemon.StopMsg) (*BCDns_daemon.OrderRep, error) {
-	panic("implement me")
+	cmd := exec.Command(ProjectPath + "stop.sh")
+	err := cmd.Run()
+	if err != nil {
+		return &BCDns_daemon.OrderRep{}, err
+	}
+	return &BCDns_daemon.OrderRep{}, nil
 }
 
 func main() {
+	flag.Parse()
 	addr, err := net.ResolveUDPAddr("udp", StatusAddr)
 	if err != nil {
 		panic(err)
