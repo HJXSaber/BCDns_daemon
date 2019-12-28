@@ -33,7 +33,7 @@ func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*
 	cmd := exec.Command(ProjectPath + "swapCert.sh", req.Ip)
 	err := cmd.Run()
 	if err != nil {
-		return &BCDns_daemon.OrderRep{}, err	
+		return &BCDns_daemon.OrderRep{}, err
 	}
 	return &BCDns_daemon.OrderRep{}, nil
 }
@@ -46,12 +46,7 @@ func (*Server) DoStartServer(context.Context, *BCDns_daemon.StartServerReq) (*BC
 		if err != nil {
 			errChan <- err
 		}
-		errChan <- nil
 	}()
-	err := <- errChan
-	if err != nil {
-		return &BCDns_daemon.StartServerRep{}, err
-	}
 	dataChan := make(chan []byte)
 	go func() {
 		data := make([]byte, 1024)
@@ -62,7 +57,7 @@ func (*Server) DoStartServer(context.Context, *BCDns_daemon.StartServerReq) (*BC
 		dataChan <- data[:l]
 	}()
 	select {
-	case err = <- errChan:
+	case err := <- errChan:
 		return &BCDns_daemon.StartServerRep{}, err
 	case data := <- dataChan:
 		var msg ServerMsg
@@ -79,15 +74,23 @@ func (*Server) DoStartServer(context.Context, *BCDns_daemon.StartServerReq) (*BC
 }
 
 func (*Server) DoStartClient(context.Context, *BCDns_daemon.StartClientReq) (*BCDns_daemon.StartClientRep, error) {
-	cmd := exec.Command(ClientPath + "start.sh")
+	cmd := exec.Command(ClientPath + "start.sh", "0")
 	err := cmd.Run()
 	if err != nil {
 		return &BCDns_daemon.StartClientRep{}, err
 	}
-	defer func() {
-		cmd := exec.Command(ProjectPath + "stop.sh")
-		_ = cmd.Run()
-	}()
+	time.Sleep(10 * time.Second)
+	cmd = exec.Command(ClientPath + "start.sh", "1 40")
+	err = cmd.Run()
+	if err != nil {
+		return &BCDns_daemon.StartClientRep{}, err
+	}
+	time.Sleep(5 * time.Second)
+	cmd = exec.Command(ProjectPath + "stop.sh")
+	err = cmd.Run()
+	if err != nil {
+		return &BCDns_daemon.StartClientRep{}, err
+	}
 	cmd = exec.Command(ProjectPath + "count.sh")
 	out, err := cmd.CombinedOutput()
 	if err != nil {

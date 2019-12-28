@@ -16,9 +16,7 @@ import (
 
 const (
 	SwapCert int = iota
-	StartServer
-	StartClient
-	Stop
+	Start
 )
 
 type Node struct {
@@ -70,12 +68,13 @@ func main() {
 				panic(err)
 			}
 		}
-	case StartServer:
+	case Start:
 		count := int32(0)
 		wt := &sync.WaitGroup{}
 		for _, node := range hosts {
 			wt.Add(1)
 			go func(node Node) {
+				defer wt.Done()
 				rep, err := node.Client.DoStartServer(context.Background(), &BCDns_daemon.StartServerReq{})
 				if err != nil {
 					fmt.Println(err)
@@ -92,6 +91,7 @@ func main() {
 			for _, node := range hosts {
 				wt.Add(1)
 				go func() {
+					defer wt.Done()
 					_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
 				}()
 			}
@@ -99,10 +99,9 @@ func main() {
 		} else {
 			rep, err := Leader.Client.DoStartClient(context.Background(), &BCDns_daemon.StartClientReq{})
 			if err != nil {
-				fmt.Println(err)
+				panic(err)
 			}
 			fmt.Println(rep.Latency, rep.Throughout)
 		}
-	case Stop:
 	}
 }
