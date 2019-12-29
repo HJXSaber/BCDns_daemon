@@ -6,15 +6,16 @@ message SwapCertMsg {
     string ip = 1;
 }
 
-message StartServerReq {}
+message StartServerReq {
+    bool byzantine = 1;
+}
 
 message StartServerRep {
     bool isLeader = 1;
 }
 
 message StartClientReq {
-    int32 mode = 1;
-    int32 frq = 2;
+    int32 frq = 1;
 }
 
 message StartClientRep {

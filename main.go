@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"net"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -38,10 +39,10 @@ func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*
 	return &BCDns_daemon.OrderRep{}, nil
 }
 
-func (*Server) DoStartServer(context.Context, *BCDns_daemon.StartServerReq) (*BCDns_daemon.StartServerRep, error) {
+func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerReq) (*BCDns_daemon.StartServerRep, error) {
 	errChan := make(chan error)
 	go func() {
-		cmd := exec.Command(ProjectPath + "start.sh")
+		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine))
 		err := cmd.Run()
 		if err != nil {
 			errChan <- err
@@ -73,14 +74,15 @@ func (*Server) DoStartServer(context.Context, *BCDns_daemon.StartServerReq) (*BC
 	}
 }
 
-func (*Server) DoStartClient(context.Context, *BCDns_daemon.StartClientReq) (*BCDns_daemon.StartClientRep, error) {
+func (*Server) DoStartClient(ctx context.Context, req *BCDns_daemon.StartClientReq) (*BCDns_daemon.StartClientRep, error) {
 	cmd := exec.Command(ClientPath + "start.sh", "0")
 	err := cmd.Run()
 	if err != nil {
 		return &BCDns_daemon.StartClientRep{}, err
 	}
 	time.Sleep(10 * time.Second)
-	cmd = exec.Command(ClientPath + "start.sh", "1 40")
+	frq := strconv.Itoa(int(req.Frq))
+	cmd = exec.Command(ClientPath + "start.sh", "1", frq)
 	err = cmd.Run()
 	if err != nil {
 		return &BCDns_daemon.StartClientRep{}, err
@@ -111,6 +113,8 @@ func (*Server) DoStop(context.Context, *BCDns_daemon.StopMsg) (*BCDns_daemon.Ord
 	}
 	return &BCDns_daemon.OrderRep{}, nil
 }
+
+
 
 func main() {
 	flag.Parse()

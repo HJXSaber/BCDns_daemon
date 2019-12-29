@@ -22,11 +22,14 @@ const (
 type Node struct {
 	IP string
 	Client BCDns_daemon.MethodClient
+	IsLeader bool
 }
 
 var (
 	action = flag.Int("action", 0, "Action")
 	ip = flag.String("ip", "", "IP")
+	frq = flag.Int("frq", 25, "frequency")
+	byzantine = flag.Bool("by", false, "Byzantine")
 	hosts = map[string]Node{}
 	Leader *Node
 )
@@ -69,13 +72,24 @@ func main() {
 			}
 		}
 	case Start:
+		mux := sync.Mutex{}
 		count := int32(0)
 		wt := &sync.WaitGroup{}
+		f := (len(hosts) - 1) / 3
 		for _, node := range hosts {
 			wt.Add(1)
 			go func(node Node) {
 				defer wt.Done()
-				rep, err := node.Client.DoStartServer(context.Background(), &BCDns_daemon.StartServerReq{})
+				var req BCDns_daemon.StartServerReq
+				mux.Lock()
+				if *byzantine && f != 0 {
+					req.Byzantine = true
+					f--
+				} else {
+					req.Byzantine = false
+				}
+				mux.Unlock()
+				rep, err := node.Client.DoStartServer(context.Background(), &req)
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -87,21 +101,25 @@ func main() {
 			}(node)
 		}
 		wt.Wait()
-		if count != int32(len(hosts)) {
-			for _, node := range hosts {
-				wt.Add(1)
-				go func() {
-					defer wt.Done()
-					_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
-				}()
-			}
-			wt.Wait()
-		} else {
-			rep, err := Leader.Client.DoStartClient(context.Background(), &BCDns_daemon.StartClientReq{})
+		if count == int32(len(hosts)) {
+			rep, err := Leader.Client.DoStartClient(context.Background(), &BCDns_daemon.StartClientReq{
+				Frq:int32(*frq),
+			})
 			if err != nil {
 				panic(err)
 			}
 			fmt.Println(rep.Latency, rep.Throughout)
 		}
+		for _, node := range hosts {
+			wt.Add(1)
+			go func() {
+				defer wt.Done()
+				_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
+				if err != nil {
+					fmt.Println(err)
+				}
+			}()
+		}
+		wt.Wait()
 	}
 }
