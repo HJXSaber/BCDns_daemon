@@ -17,6 +17,7 @@ import (
 const (
 	SwapCert int = iota
 	Start
+	SwitchMode
 )
 
 type Node struct {
@@ -30,6 +31,7 @@ var (
 	ip = flag.String("ip", "", "IP")
 	frq = flag.Int("frq", 25, "frequency")
 	byzantine = flag.Bool("by", false, "Byzantine")
+	mode = flag.Int("Mode", 1, "1:myBft; 2:pbft")
 	hosts = map[string]Node{}
 	Leader *Node
 )
@@ -121,5 +123,14 @@ func main() {
 			}()
 		}
 		wt.Wait()
+	case SwitchMode:
+		for _, node := range hosts {
+			_, err = node.Client.DoSwitchMode(context.Background(), &BCDns_daemon.SwitchReq{
+				Mode: int32(*mode),
+			})
+			if err != nil {
+				panic(err)
+			}
+		}
 	}
 }

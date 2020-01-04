@@ -29,8 +29,16 @@ type ServerMsg struct {
 
 type Server struct {}
 
-func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*BCDns_daemon.OrderRep, error) {
+func (*Server) DoSwitchMode(ctx context.Context, req *BCDns_daemon.SwitchReq) (*BCDns_daemon.SwitchReq, error) {
+	cmd := exec.Command(ProjectPath + "switchMode.sh", strconv.Itoa(int(req.Mode)))
+	err := cmd.Run()
+	if err != nil {
+		return &BCDns_daemon.SwitchReq{}, err
+	}
+	return &BCDns_daemon.SwitchReq{}, nil
+}
 
+func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*BCDns_daemon.OrderRep, error) {
 	cmd := exec.Command(ProjectPath + "swapCert.sh", req.Ip)
 	err := cmd.Run()
 	if err != nil {

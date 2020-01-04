@@ -23,6 +23,12 @@ message StartClientRep {
     string throughout = 2;
 }
 
+message SwitchReq {
+    int32 mode = 1;
+}
+
+message SwitchRep {}
+
 message StopMsg {}
 
 message OrderRep {}
@@ -32,4 +38,5 @@ service Method {
     rpc DoStartServer(StartServerReq) returns(StartServerRep) {}
     rpc DoStartClient(StartClientReq) returns(StartClientRep) {}
     rpc DoStop(StopMsg) returns(OrderRep) {}
+    rpc DoSwitchMode(SwitchReq) returns(SwitchReq) {}
 }
