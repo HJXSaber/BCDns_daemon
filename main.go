@@ -48,7 +48,7 @@ func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*
 }
 
 func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerReq) (*BCDns_daemon.StartServerRep, error) {
-	errChan := make(chan error)
+	errChan := make(chan error, 5)
 	go func() {
 		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine))
 		err := cmd.Run()
@@ -56,7 +56,7 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 			errChan <- err
 		}
 	}()
-	dataChan := make(chan []byte)
+	dataChan := make(chan []byte, 5)
 	go func() {
 		data := make([]byte, 1024)
 		l, err := Conn.Read(data)
@@ -77,7 +77,7 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 		return &BCDns_daemon.StartServerRep{
 			IsLeader:msg.IsLeader,
 		}, nil
-	case <- time.After(10 * time.Second):
+	case <- time.After(60 * time.Second):
 		return &BCDns_daemon.StartServerRep{}, errors.New("TimeOut")
 	}
 }
@@ -110,6 +110,7 @@ func (*Server) DoStartClient(ctx context.Context, req *BCDns_daemon.StartClientR
 	return &BCDns_daemon.StartClientRep{
 		Latency: strings.Split(output, " ")[0],
 		Throughout: strings.Split(output, " ")[1],
+		SendRate: strings.Split(output, " ")[2],
 	}, nil
 }
 

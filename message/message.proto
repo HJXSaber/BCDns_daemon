@@ -21,6 +21,7 @@ message StartClientReq {
 message StartClientRep {
     string latency = 1;
     string throughout = 2;
+    string sendRate = 3;
 }
 
 message SwitchReq {

@@ -17,6 +17,7 @@ import (
 const (
 	SwapCert int = iota
 	Start
+	Stop
 	SwitchMode
 )
 
@@ -38,7 +39,7 @@ var (
 
 func main() {
 	flag.Parse()
-	file, err := os.Open("/workspace/hosts")
+	file, err := os.Open("/tmp/hosts")
 	defer file.Close()
 	if err != nil {
 		panic(err)
@@ -54,7 +55,7 @@ func main() {
 		node := Node{
 			IP:strings.Split(l, " ")[0] + ":5000",
 		}
-		conn, err := grpc.Dial("127.0.0.1:5000", grpc.WithInsecure())
+		conn, err := grpc.Dial(node.IP, grpc.WithInsecure())
 		if err != nil {
 			panic(hosts[strings.Split(l, " ")[1]])
 		}
@@ -123,13 +124,26 @@ func main() {
 			}()
 		}
 		wt.Wait()
+	case Stop:
+		wt := &sync.WaitGroup{}
+		for _, node := range hosts {
+			wt.Add(1)
+			go func() {
+				defer wt.Done()
+				_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
+				if err != nil {
+					fmt.Println(err)
+				}
+			}()
+		}
+		wt.Wait()
 	case SwitchMode:
 		for _, node := range hosts {
 			_, err = node.Client.DoSwitchMode(context.Background(), &BCDns_daemon.SwitchReq{
 				Mode: int32(*mode),
 			})
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
 			}
 		}
 	}
