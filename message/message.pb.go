@@ -4,8 +4,12 @@
 package BCDns_daemon
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -402,4 +406,228 @@ var fileDescriptor_33c57e4bae7b9afd = []byte{
 	0x1b, 0x43, 0xdf, 0xb0, 0x31, 0x30, 0x43, 0x9e, 0x20, 0xf9, 0x5f, 0xa7, 0x53, 0xee, 0xc1, 0xff,
 	0x49, 0xa0, 0x8d, 0x59, 0xdb, 0xfe, 0xe6, 0x87, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x63, 0xb1,
 	0x6a, 0x91, 0xde, 0x02, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// MethodClient is the client API for Method service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type MethodClient interface {
+	DoSwapCert(ctx context.Context, in *SwapCertMsg, opts ...grpc.CallOption) (*OrderRep, error)
+	DoStartServer(ctx context.Context, in *StartServerReq, opts ...grpc.CallOption) (*StartServerRep, error)
+	DoStartClient(ctx context.Context, in *StartClientReq, opts ...grpc.CallOption) (*StartClientRep, error)
+	DoStop(ctx context.Context, in *StopMsg, opts ...grpc.CallOption) (*OrderRep, error)
+	DoSwitchMode(ctx context.Context, in *SwitchReq, opts ...grpc.CallOption) (*SwitchReq, error)
+}
+
+type methodClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewMethodClient(cc *grpc.ClientConn) MethodClient {
+	return &methodClient{cc}
+}
+
+func (c *methodClient) DoSwapCert(ctx context.Context, in *SwapCertMsg, opts ...grpc.CallOption) (*OrderRep, error) {
+	out := new(OrderRep)
+	err := c.cc.Invoke(ctx, "/BCDns_daemon.Method/DoSwapCert", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *methodClient) DoStartServer(ctx context.Context, in *StartServerReq, opts ...grpc.CallOption) (*StartServerRep, error) {
+	out := new(StartServerRep)
+	err := c.cc.Invoke(ctx, "/BCDns_daemon.Method/DoStartServer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *methodClient) DoStartClient(ctx context.Context, in *StartClientReq, opts ...grpc.CallOption) (*StartClientRep, error) {
+	out := new(StartClientRep)
+	err := c.cc.Invoke(ctx, "/BCDns_daemon.Method/DoStartClient", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *methodClient) DoStop(ctx context.Context, in *StopMsg, opts ...grpc.CallOption) (*OrderRep, error) {
+	out := new(OrderRep)
+	err := c.cc.Invoke(ctx, "/BCDns_daemon.Method/DoStop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *methodClient) DoSwitchMode(ctx context.Context, in *SwitchReq, opts ...grpc.CallOption) (*SwitchReq, error) {
+	out := new(SwitchReq)
+	err := c.cc.Invoke(ctx, "/BCDns_daemon.Method/DoSwitchMode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// MethodServer is the server API for Method service.
+type MethodServer interface {
+	DoSwapCert(context.Context, *SwapCertMsg) (*OrderRep, error)
+	DoStartServer(context.Context, *StartServerReq) (*StartServerRep, error)
+	DoStartClient(context.Context, *StartClientReq) (*StartClientRep, error)
+	DoStop(context.Context, *StopMsg) (*OrderRep, error)
+	DoSwitchMode(context.Context, *SwitchReq) (*SwitchReq, error)
+}
+
+// UnimplementedMethodServer can be embedded to have forward compatible implementations.
+type UnimplementedMethodServer struct {
+}
+
+func (*UnimplementedMethodServer) DoSwapCert(ctx context.Context, req *SwapCertMsg) (*OrderRep, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoSwapCert not implemented")
+}
+func (*UnimplementedMethodServer) DoStartServer(ctx context.Context, req *StartServerReq) (*StartServerRep, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoStartServer not implemented")
+}
+func (*UnimplementedMethodServer) DoStartClient(ctx context.Context, req *StartClientReq) (*StartClientRep, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoStartClient not implemented")
+}
+func (*UnimplementedMethodServer) DoStop(ctx context.Context, req *StopMsg) (*OrderRep, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoStop not implemented")
+}
+func (*UnimplementedMethodServer) DoSwitchMode(ctx context.Context, req *SwitchReq) (*SwitchReq, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoSwitchMode not implemented")
+}
+
+func RegisterMethodServer(s *grpc.Server, srv MethodServer) {
+	s.RegisterService(&_Method_serviceDesc, srv)
+}
+
+func _Method_DoSwapCert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SwapCertMsg)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MethodServer).DoSwapCert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BCDns_daemon.Method/DoSwapCert",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MethodServer).DoSwapCert(ctx, req.(*SwapCertMsg))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Method_DoStartServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartServerReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MethodServer).DoStartServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BCDns_daemon.Method/DoStartServer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MethodServer).DoStartServer(ctx, req.(*StartServerReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Method_DoStartClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartClientReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MethodServer).DoStartClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BCDns_daemon.Method/DoStartClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MethodServer).DoStartClient(ctx, req.(*StartClientReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Method_DoStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopMsg)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MethodServer).DoStop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BCDns_daemon.Method/DoStop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MethodServer).DoStop(ctx, req.(*StopMsg))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Method_DoSwitchMode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SwitchReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MethodServer).DoSwitchMode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BCDns_daemon.Method/DoSwitchMode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MethodServer).DoSwitchMode(ctx, req.(*SwitchReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Method_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "BCDns_daemon.Method",
+	HandlerType: (*MethodServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "DoSwapCert",
+			Handler:    _Method_DoSwapCert_Handler,
+		},
+		{
+			MethodName: "DoStartServer",
+			Handler:    _Method_DoStartServer_Handler,
+		},
+		{
+			MethodName: "DoStartClient",
+			Handler:    _Method_DoStartClient_Handler,
+		},
+		{
+			MethodName: "DoStop",
+			Handler:    _Method_DoStop_Handler,
+		},
+		{
+			MethodName: "DoSwitchMode",
+			Handler:    _Method_DoSwitchMode_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "message.proto",
 }
