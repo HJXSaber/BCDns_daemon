@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 const (
@@ -102,6 +103,7 @@ func main() {
 				}
 				atomic.AddInt32(&count, 1)
 			}(node)
+			time.Sleep(1500 * time.Millisecond)
 		}
 		wt.Wait()
 		fmt.Println("Leader is", Leader)
