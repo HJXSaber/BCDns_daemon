@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -67,8 +68,10 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 	}()
 	select {
 	case err := <- errChan:
+		fmt.Println(1)
 		return &BCDns_daemon.StartServerRep{}, err
 	case data := <- dataChan:
+		fmt.Println(2)
 		var msg ServerMsg
 		err := json.Unmarshal(data, &msg)
 		if err != nil {
