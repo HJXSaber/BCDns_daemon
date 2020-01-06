@@ -76,23 +76,17 @@ func main() {
 			}
 		}
 	case Start:
-		mux := sync.Mutex{}
 		count := int32(0)
 		wt := &sync.WaitGroup{}
 		f := (len(hosts) - 1) / 3
+		index := 0
 		for _, node := range hosts {
 			wt.Add(1)
-			go func(node Node) {
+			go func(node Node, b bool) {
 				defer wt.Done()
+				fmt.Println(1)
 				var req BCDns_daemon.StartServerReq
-				mux.Lock()
-				if *byzantine && f != 0 {
-					req.Byzantine = true
-					f--
-				} else {
-					req.Byzantine = false
-				}
-				mux.Unlock()
+				req.Byzantine = b
 				rep, err := node.Client.DoStartServer(context.Background(), &req)
 				if err != nil {
 					fmt.Println(err, node)
@@ -102,7 +96,8 @@ func main() {
 					Leader = &node
 				}
 				atomic.AddInt32(&count, 1)
-			}(node)
+			}(node, *byzantine && index < f)
+			index++
 			time.Sleep(1500 * time.Millisecond)
 		}
 		wt.Wait()
