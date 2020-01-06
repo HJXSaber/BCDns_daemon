@@ -94,7 +94,7 @@ func main() {
 				mux.Unlock()
 				rep, err := node.Client.DoStartServer(context.Background(), &req)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println(err, node)
 					return
 				}
 				if rep.IsLeader {
@@ -110,7 +110,7 @@ func main() {
 				Frq:int32(*frq),
 			})
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
 			}
 			fmt.Println(rep.Latency, rep.Throughout)
 		}
@@ -120,7 +120,7 @@ func main() {
 				defer wt.Done()
 				_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println(err, node)
 				}
 			}()
 		}
@@ -133,7 +133,7 @@ func main() {
 				defer wt.Done()
 				_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println(err, node)
 				}
 			}()
 		}
@@ -144,7 +144,7 @@ func main() {
 				Mode: int32(*mode),
 			})
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err, node)
 			}
 		}
 	}
