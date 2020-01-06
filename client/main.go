@@ -71,7 +71,7 @@ func main() {
 				Ip: *ip,
 			})
 			if err != nil {
-				panic(err)
+				fmt.Println(err, node)
 			}
 		}
 	case Start:
@@ -112,30 +112,30 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println(rep.Latency, rep.Throughout)
+			fmt.Println(rep.Latency, rep.Throughout, rep.SendRate)
 		}
 		for _, node := range hosts {
 			wt.Add(1)
-			go func() {
+			go func(node Node) {
 				defer wt.Done()
 				_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
 				if err != nil {
 					fmt.Println(err, node)
 				}
-			}()
+			}(node)
 		}
 		wt.Wait()
 	case Stop:
 		wt := &sync.WaitGroup{}
 		for _, node := range hosts {
 			wt.Add(1)
-			go func() {
+			go func(node Node) {
 				defer wt.Done()
 				_, err = node.Client.DoStop(context.Background(), &BCDns_daemon.StopMsg{})
 				if err != nil {
 					fmt.Println(err, node)
 				}
-			}()
+			}(node)
 		}
 		wt.Wait()
 	case SwitchMode:
