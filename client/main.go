@@ -104,6 +104,7 @@ func main() {
 			}(node)
 		}
 		wt.Wait()
+		fmt.Println("Leader is", Leader)
 		if count == int32(len(hosts)) {
 			rep, err := Leader.Client.DoStartClient(context.Background(), &BCDns_daemon.StartClientReq{
 				Frq:int32(*frq),
