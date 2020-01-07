@@ -87,6 +87,10 @@ func main() {
 				fmt.Println(1)
 				var req BCDns_daemon.StartServerReq
 				req.Byzantine = b
+				switch *mode {
+				case 1: req.Mode = "MYBFT"
+				case 2: req.Mode = "PBFT"
+				}
 				rep, err := node.Client.DoStartServer(context.Background(), &req)
 				if err != nil {
 					fmt.Println(err, node)
@@ -98,7 +102,6 @@ func main() {
 				atomic.AddInt32(&count, 1)
 			}(node, *byzantine && index < f)
 			index++
-			time.Sleep(1500 * time.Millisecond)
 		}
 		wt.Wait()
 		fmt.Println("Leader is", Leader)

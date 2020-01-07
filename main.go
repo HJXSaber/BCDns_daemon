@@ -49,15 +49,15 @@ func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*
 }
 
 func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerReq) (*BCDns_daemon.StartServerRep, error) {
-	errChan := make(chan error, 5)
+	errChan := make(chan error, 100)
 	go func() {
-		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine))
+		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine), req.Mode)
 		err := cmd.Run()
 		if err != nil {
 			errChan <- err
 		}
 	}()
-	dataChan := make(chan []byte, 5)
+	dataChan := make(chan []byte, 100)
 	go func() {
 		data := make([]byte, 1024)
 		l, err := Conn.Read(data)
@@ -80,7 +80,7 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 		return &BCDns_daemon.StartServerRep{
 			IsLeader:msg.IsLeader,
 		}, nil
-	case <- time.After(60 * time.Second):
+	case <- time.After(20 * time.Second):
 		return &BCDns_daemon.StartServerRep{}, errors.New("TimeOut")
 	}
 }
