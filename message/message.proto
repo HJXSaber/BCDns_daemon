@@ -16,7 +16,7 @@ message StartServerRep {
 }
 
 message StartClientReq {
-    int32 frq = 1;
+    float frq = 1;
 }
 
 message StartClientRep {

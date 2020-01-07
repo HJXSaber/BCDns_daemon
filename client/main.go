@@ -30,7 +30,7 @@ type Node struct {
 var (
 	action = flag.Int("action", 0, "Action")
 	ip = flag.String("ip", "", "IP")
-	frq = flag.Int("frq", 25, "frequency")
+	frq = flag.Float64("frq", 25, "frequency")
 	byzantine = flag.Bool("by", false, "Byzantine")
 	mode = flag.Int("Mode", 1, "1:myBft; 2:pbft")
 	hosts = map[string]Node{}
@@ -106,7 +106,7 @@ func main() {
 		fmt.Println("Leader is", Leader)
 		if count == int32(len(hosts)) {
 			rep, err := Leader.Client.DoStartClient(context.Background(), &BCDns_daemon.StartClientReq{
-				Frq:int32(*frq),
+				Frq: float32(*frq),
 			})
 			if err != nil {
 				fmt.Println(err)
