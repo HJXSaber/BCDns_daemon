@@ -30,7 +30,7 @@ type Node struct {
 var (
 	action = flag.Int("action", 0, "Action")
 	ip = flag.String("ip", "", "IP")
-	frq = flag.Float64("frq", 25, "frequency")
+	frq = flag.Float64("frq", 25, "frequency ms")
 	byzantine = flag.Bool("by", false, "Byzantine")
 	mode = flag.Int("Mode", 1, "1:myBft; 2:pbft")
 	hosts = map[string]Node{}
