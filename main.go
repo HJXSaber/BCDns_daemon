@@ -80,7 +80,7 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 		return &BCDns_daemon.StartServerRep{
 			IsLeader:msg.IsLeader,
 		}, nil
-	case <- time.After(20 * time.Second):
+	case <- time.After(30 * time.Second):
 		return &BCDns_daemon.StartServerRep{}, errors.New("TimeOut")
 	}
 }
@@ -92,7 +92,7 @@ func (*Server) DoStartClient(ctx context.Context, req *BCDns_daemon.StartClientR
 		return &BCDns_daemon.StartClientRep{}, err
 	}
 	time.Sleep(10 * time.Second)
-	frq := strconv.Itoa(int(req.Frq))
+	frq := strconv.FormatFloat(float64(req.Frq), 'f', 3, 64)
 	cmd = exec.Command(ClientPath + "start.sh", "1", frq)
 	err = cmd.Run()
 	if err != nil {

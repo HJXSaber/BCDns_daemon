@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 const (
@@ -33,6 +34,7 @@ var (
 	frq = flag.Float64("frq", 25, "frequency ms")
 	byzantine = flag.Bool("by", false, "Byzantine")
 	mode = flag.Int("Mode", 1, "1:myBft; 2:pbft")
+	stagger = flag.Bool("stagger", false, "stagger start server")
 	hosts = map[string]Node{}
 	Leader *Node
 )
@@ -101,6 +103,9 @@ func main() {
 				atomic.AddInt32(&count, 1)
 			}(node, *byzantine && index < f)
 			index++
+			if *stagger {
+				time.Sleep(time.Millisecond * 500)
+			}
 		}
 		wt.Wait()
 		fmt.Println("Leader is", Leader)
