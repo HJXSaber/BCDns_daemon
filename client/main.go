@@ -104,7 +104,7 @@ func main() {
 			}(node, *byzantine && index < f)
 			index++
 			if *stagger {
-				time.Sleep(time.Millisecond * 500)
+				time.Sleep(time.Millisecond * 300)
 			}
 		}
 		wt.Wait()
