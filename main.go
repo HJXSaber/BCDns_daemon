@@ -98,12 +98,6 @@ func (*Server) DoStartClient(ctx context.Context, req *BCDns_daemon.StartClientR
 	if err != nil {
 		return &BCDns_daemon.StartClientRep{}, err
 	}
-	time.Sleep(5 * time.Second)
-	cmd = exec.Command(ProjectPath + "stop.sh")
-	err = cmd.Run()
-	if err != nil {
-		return &BCDns_daemon.StartClientRep{}, err
-	}
 	cmd = exec.Command(ProjectPath + "count.sh")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
