@@ -9,6 +9,7 @@ message SwapCertMsg {
 message StartServerReq {
     bool byzantine = 1;
     string mode = 2;
+    string test = 3;
 }
 
 message StartServerRep {

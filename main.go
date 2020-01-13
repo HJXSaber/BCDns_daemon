@@ -51,7 +51,7 @@ func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*
 func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerReq) (*BCDns_daemon.StartServerRep, error) {
 	errChan := make(chan error, 100)
 	go func() {
-		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine), req.Mode)
+		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine), req.Mode, req.Test)
 		err := cmd.Run()
 		if err != nil {
 			errChan <- err
