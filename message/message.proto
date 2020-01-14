@@ -30,6 +30,12 @@ message SwitchReq {
     int32 mode = 1;
 }
 
+message TestReq {}
+
+message TestRep {
+    int32 count = 1;
+}
+
 message SwitchRep {}
 
 message StopMsg {}
@@ -42,4 +48,5 @@ service Method {
     rpc DoStartClient(StartClientReq) returns(StartClientRep) {}
     rpc DoStop(StopMsg) returns(OrderRep) {}
     rpc DoSwitchMode(SwitchReq) returns(SwitchReq) {}
+    rpc DoTest(TestReq) returns(TestRep) {}
 }

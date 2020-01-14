@@ -19,6 +19,7 @@ const (
 	SwapCert int = iota
 	Start
 	Stop
+	TestPerformence
 	SwitchMode
 )
 
@@ -144,6 +145,24 @@ func main() {
 			}(node)
 		}
 		wt.Wait()
+	case TestPerformence:
+		var amount, s int32
+		wt := &sync.WaitGroup{}
+		for _, node := range hosts {
+			wt.Add(1)
+			go func(node Node) {
+				defer wt.Done()
+				rep, err := node.Client.DoTest(context.Background(), &BCDns_daemon.TestReq{})
+				if err != nil {
+					fmt.Println(err, node)
+					return
+				}
+				atomic.AddInt32(&amount, rep.Count)
+				atomic.AddInt32(&s, 1)
+			}(node)
+		}
+		wt.Wait()
+		fmt.Println(amount / s)
 	case SwitchMode:
 		for _, node := range hosts {
 			_, err = node.Client.DoSwitchMode(context.Background(), &BCDns_daemon.SwitchReq{

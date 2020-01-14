@@ -30,6 +30,22 @@ type ServerMsg struct {
 
 type Server struct {}
 
+func (*Server) DoTest(context.Context, *BCDns_daemon.TestReq) (*BCDns_daemon.TestRep, error) {
+	cmd := exec.Command(ProjectPath + "testPerformance.sh")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return &BCDns_daemon.TestRep{}, err
+	}
+	output := string(out)
+	i, err := strconv.Atoi(output)
+	if err != nil {
+		return &BCDns_daemon.TestRep{}, err
+	}
+	return &BCDns_daemon.TestRep{
+		Count:int32(i),
+	}, nil
+}
+
 func (*Server) DoSwitchMode(ctx context.Context, req *BCDns_daemon.SwitchReq) (*BCDns_daemon.SwitchReq, error) {
 	cmd := exec.Command(ProjectPath + "switchMode.sh", strconv.Itoa(int(req.Mode)))
 	err := cmd.Run()
