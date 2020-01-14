@@ -87,7 +87,7 @@ func main() {
 			wt.Add(1)
 			go func(node Node, b bool) {
 				defer wt.Done()
-				fmt.Println(1)
+				fmt.Println(b, node)
 				var req BCDns_daemon.StartServerReq
 				req.Byzantine = b
 				req.Test = *test

@@ -104,7 +104,7 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 		return &BCDns_daemon.StartServerRep{
 			IsLeader:msg.IsLeader,
 		}, nil
-	case <- time.After(60 * time.Second):
+	case <- time.After(100 * time.Second):
 		return &BCDns_daemon.StartServerRep{}, errors.New("TimeOut")
 	}
 }
