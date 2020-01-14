@@ -21,7 +21,6 @@ var (
 	StatusAddr = "127.0.0.1:5001"
 	ProjectPath = "/go/src/BCDns_0.1/"
 	ClientPath = "/go/src/BCDns_client/"
-	Conn *net.UDPConn
 )
 
 type ServerMsg struct {
@@ -65,6 +64,15 @@ func (*Server) DoSwapCert(ctx context.Context, req *BCDns_daemon.SwapCertMsg) (*
 }
 
 func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerReq) (*BCDns_daemon.StartServerRep, error) {
+	addr, err := net.ResolveUDPAddr("udp", StatusAddr)
+	if err != nil {
+		return &BCDns_daemon.StartServerRep{}, err
+	}
+	conn, err := net.ListenUDP("udp", addr)
+	if err != nil {
+		return &BCDns_daemon.StartServerRep{}, err
+	}
+	defer conn.Close()
 	errChan := make(chan error, 100)
 	go func() {
 		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine), req.Mode, req.Test)
@@ -76,7 +84,7 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 	dataChan := make(chan []byte, 100)
 	go func() {
 		data := make([]byte, 1024)
-		l, err := Conn.Read(data)
+		l, err := conn.Read(data)
 		if err != nil {
 			errChan <- err
 		}
@@ -140,11 +148,6 @@ func (*Server) DoStop(context.Context, *BCDns_daemon.StopMsg) (*BCDns_daemon.Ord
 
 func main() {
 	flag.Parse()
-	addr, err := net.ResolveUDPAddr("udp", StatusAddr)
-	if err != nil {
-		panic(err)
-	}
-	Conn, err = net.ListenUDP("udp", addr)
 	lis, err := net.Listen("tcp", Addr)
 	if err != nil {
 		panic(err)
