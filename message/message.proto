@@ -10,6 +10,7 @@ message StartServerReq {
     bool byzantine = 1;
     string mode = 2;
     string test = 3;
+    int32 delay = 4;
 }
 
 message StartServerRep {

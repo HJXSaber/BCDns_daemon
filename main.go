@@ -36,7 +36,7 @@ func (*Server) DoTest(context.Context, *BCDns_daemon.TestReq) (*BCDns_daemon.Tes
 		return &BCDns_daemon.TestRep{}, err
 	}
 	output := string(out)
-	i, err := strconv.Atoi(output)
+	i, err := strconv.Atoi(strings.Split(output, " ")[0])
 	if err != nil {
 		return &BCDns_daemon.TestRep{}, err
 	}
@@ -75,7 +75,9 @@ func (*Server) DoStartServer(ctx context.Context, req *BCDns_daemon.StartServerR
 	defer conn.Close()
 	errChan := make(chan error, 100)
 	go func() {
-		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine), req.Mode, req.Test)
+		delay := strconv.Itoa(int(req.Delay))
+		cmd := exec.Command(ProjectPath + "start.sh", strconv.FormatBool(req.Byzantine), req.Mode,
+			req.Test, delay)
 		err := cmd.Run()
 		if err != nil {
 			errChan <- err
