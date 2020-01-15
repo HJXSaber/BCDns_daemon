@@ -37,6 +37,7 @@ var (
 	mode = flag.Int("Mode", 1, "1:myBft; 2:pbft")
 	stagger = flag.Bool("stagger", false, "stagger start server")
 	test = flag.String("test", "no", "test mode yes/no; default no")
+	delay = flag.Int("delay", 0, "Set network delay default 0")
 	hosts = map[string]Node{}
 	Leader *Node
 )
@@ -91,6 +92,7 @@ func main() {
 				var req BCDns_daemon.StartServerReq
 				req.Byzantine = b
 				req.Test = *test
+				req.Delay = int32(*delay)
 				switch *mode {
 				case 1: req.Mode = "MYBFT"
 				case 2: req.Mode = "PBFT"
